@@ -4,16 +4,31 @@ A command-line tool for managing XCP-ng / XenServer hosts via the XAPI JSON-RPC 
 
 ## Requirements
 
-- Go 1.22+
-- [UPX](https://upx.github.io/) (optional, used by `make build` to compress the binary)
+- Go 1.26+
+- [UPX](https://upx.github.io/) (used by `make build` and `make build-prod` to compress the binary)
 
 ## Build
 
 ```bash
+# Development build
 make build
+
+# Production build (static binary, stripped symbols)
+make build-prod
 ```
 
 The binary is output to `./xapi-cli`.
+
+## Release
+
+Releases are automated via GitHub Actions. Basta criar e fazer push de uma tag `v*`:
+
+```bash
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+O workflow irá compilar o binário, empacotá-lo em `xapi-cli_{VERSION}_linux_amd64.tar.gz` e criar a release no GitHub automaticamente.
 
 ## Configuration
 
@@ -84,9 +99,11 @@ Output example:
 ## Project Structure
 
 ```
-main.go           # Root command, global flags, entrypoint
-session.go        # XenServer session helper
-cmd_list.go       # list command
-cmd_snapshot.go   # snap and list-snap commands
-src/              # xenapi SDK (package xenapi)
+main.go                                    # Root command, global flags, entrypoint
+session.go                                 # XenServer session helper
+cmd_list.go                                # list command
+cmd_snapshot.go                            # snap and list-snap commands
+Makefile                                   # build, build-prod, deps, clean targets
+DOCS/XenServer-SDK/XenServerGo/src/        # xenapi SDK (package xenapi)
+.github/workflows/release.yml             # GitHub Actions release workflow
 ```
