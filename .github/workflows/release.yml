@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Set timezone
+        run: |
+          sudo timedatectl set-timezone America/Sao_Paulo
+          timedatectl
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+
+      - name: Install dependencies
+        run: sudo apt-get install -y upx
+
+      - name: Download Go modules
+        run: make deps
+
+      - name: Build production binary
+        run: make build-prod
+        env:
+          VERSION: ${{ github.ref_name }}
+
+      - name: Package binary
+        run: |
+          VERSION=${{ github.ref_name }}
+          tar -czf xapi-cli_${VERSION}_linux_amd64.tar.gz xapi-cli
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: xapi-cli_${{ github.ref_name }}_linux_amd64.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
