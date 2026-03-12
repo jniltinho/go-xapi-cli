@@ -41,7 +41,7 @@ func listVMs(session *xenapi.Session) {
 			continue
 		}
 
-		if record.IsATemplate || record.IsControlDomain {
+		if record.IsATemplate || record.IsControlDomain || record.IsASnapshot {
 			continue
 		}
 
