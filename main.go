@@ -37,7 +37,7 @@ func main() {
 
 	root.Version = Version
 	root.SetVersionTemplate(fmt.Sprintf("XAPI-CLI version %s (Build Date: %s)\n", Version, BuildDate))
-	root.AddCommand(newListCmd(), newSnapshotCmd(), newListSnapshotsCmd())
+	root.AddCommand(newListCmd(), newSnapshotCmd(), newListSnapshotsCmd(), newListAllSnapshotsCmd())
 
 	if err := root.Execute(); err != nil {
 		os.Exit(1)

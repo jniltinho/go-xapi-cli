@@ -1,7 +1,7 @@
 .PHONY: all build build-prod run clean test
 
 APP_NAME = xapi-cli
-VERSION  = v0.1.1
+VERSION  = v0.1.2
 DATE     = $(shell date +%Y-%m-%d\ %H:%M)
 BUILDDATE = $(shell date +%Y%m%d%H%M)
 

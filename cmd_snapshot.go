@@ -79,6 +79,62 @@ func listSnapshots(session *xenapi.Session, vmName string) {
 	t.Render()
 }
 
+func newListAllSnapshotsCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "list-all-snaps",
+		Short: "List all snapshots in the host",
+		Run: func(cmd *cobra.Command, args []string) {
+			session := newSession()
+			defer session.Logout()
+			listAllSnapshots(session)
+		},
+	}
+}
+
+func listAllSnapshots(session *xenapi.Session) {
+	vms, err := xenapi.VM.GetAll(session)
+	if err != nil {
+		log.Fatalf("Failed to fetch VMs: %v", err)
+	}
+
+	type snap struct {
+		vmName string
+		name   string
+		uuid   string
+		time   time.Time
+	}
+
+	var snaps []snap
+	for _, vmRef := range vms {
+		rec, err := xenapi.VM.GetRecord(session, vmRef)
+		if err != nil || !rec.IsASnapshot {
+			continue
+		}
+		snaps = append(snaps, snap{
+			vmName: string(rec.SnapshotOf),
+			name:   rec.NameLabel,
+			uuid:   rec.UUID,
+			time:   rec.SnapshotTime.In(time.FixedZone("UTC-3", -3*60*60)),
+		})
+	}
+
+	sort.Slice(snaps, func(i, j int) bool {
+		return snaps[i].time.Before(snaps[j].time)
+	})
+
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"#", "Snapshot Name", "UUID", "Created At"})
+
+	for i, s := range snaps {
+		t.AppendRow([]any{i + 1, s.name, s.uuid, s.time.Format(time.DateTime)})
+		t.AppendSeparator()
+	}
+
+	t.AppendFooter(table.Row{"", "", "Total", len(snaps)})
+	t.Render()
+}
+
 func newSnapshotCmd() *cobra.Command {
 	var vmName string
 	var retain int
