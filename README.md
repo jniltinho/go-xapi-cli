@@ -96,13 +96,22 @@ Output example:
 +---+---------------------------+--------------------------------------+---------------------+
 ```
 
+### `list-all-snaps` — List all snapshots in the host
+
+Lists all snapshots across all VMs, sorted by creation date (displayed in UTC-3).
+
+```bash
+xapi-cli list-all-snaps
+```
+
 ## Project Structure
 
 ```
 main.go                                    # Root command, global flags, entrypoint
 session.go                                 # XenServer session helper
 cmd_list.go                                # list command
-cmd_snapshot.go                            # snap and list-snap commands
+cmd_snapshot.go                            # snap command (create, retention, destroy)
+cmd_list_snaps.go                          # list-snap and list-all-snaps commands
 Makefile                                   # build, build-prod, deps, clean targets
 DOCS/XenServer-SDK/XenServerGo/src/        # xenapi SDK (package xenapi)
 .github/workflows/release.yml             # GitHub Actions release workflow
